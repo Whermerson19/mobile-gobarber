@@ -15,8 +15,12 @@ import { Container,
     } from './styles';
 
 import logoImg from '../../assets/logo.png';
+import { useNavigation } from '@react-navigation/native';
 
 const SignIn: React.FC = () => {
+
+    const navigation = useNavigation();
+
     return (
         <KeyboardAvoidingView 
             style={{flex: 1}}
@@ -41,7 +45,7 @@ const SignIn: React.FC = () => {
                     </ForgotPassword>
                 </Container>
 
-                <CreateAccountButton onPress={() => {console.log('click')}}>
+                <CreateAccountButton onPress={() => navigation.navigate("SignUp")}>
                     <Icon name="log-in" size={20} color="#ff9000" />
                     <CreateAccountButtonText>SignUp</CreateAccountButtonText>
                 </CreateAccountButton>
