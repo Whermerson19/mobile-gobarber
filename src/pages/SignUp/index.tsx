@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -15,8 +15,12 @@ import { Container,
     } from './styles';
 
 import logoImg from '../../assets/logo.png';
+import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 
 const SignUp: React.FC = () => {
+
+    const formRef = useRef<FormHandles>(null);
 
     const navigation = useNavigation();
 
@@ -34,11 +38,15 @@ const SignUp: React.FC = () => {
                     <Image source={logoImg} />
                     <Title>Sign Up</Title>
 
+                    <Form ref={formRef} onSubmit={(data) => {console.log(data)}} >
+
                     <Input name='nome' icon='user' placeholder='Name' />
                     <Input name='email' icon='mail' placeholder='E-mail' />
                     <Input name='password' icon='lock' placeholder='Password' />
 
-                    <Button onPress={() => {console.log('click')}} >Entrar</Button>
+                    <Button onPress={() => {formRef.current?.submitForm()}} >Register</Button>
+
+                    </Form>
 
                 </Container>
 
