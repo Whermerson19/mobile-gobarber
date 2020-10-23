@@ -1,5 +1,7 @@
 import React, { useCallback, useRef } from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, TextInput } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, TextInput } from 'react-native';
+
+import * as yup from 'yup';
 
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -19,6 +21,12 @@ import { Container,
 import logoImg from '../../assets/logo.png';
 import { useNavigation } from '@react-navigation/native';
 import { FormHandles } from '@unform/core';
+import getValidationErrors from '../../utils/getValidationsErrors';
+
+interface ISignInFormData {
+    email: string;
+    password: string;
+}
 
 const SignIn: React.FC = () => {
 
@@ -27,8 +35,25 @@ const SignIn: React.FC = () => {
 
     const navigation = useNavigation();
 
-    const handleSubmit = useCallback((data: object) => {
-        console.log(data);
+    const handleSubmit = useCallback(async(data: ISignInFormData) => {
+        try {
+
+            formRef.current?.setErrors({});
+
+            const schema = yup.object().shape({
+                email: yup.string().required('required field').email('invalid email format'),
+                password: yup.string().required('required field'),
+            });
+
+            await schema.validate(data, { abortEarly: false });
+        } catch(err) {
+            if(err instanceof yup.ValidationError) {
+                const errors = getValidationErrors(err);
+
+                formRef.current?.setErrors(errors);
+                return;
+            }
+        }
     }, []);
 
     return (

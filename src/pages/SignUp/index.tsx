@@ -1,5 +1,9 @@
-import React, { useRef } from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, TextInput } from 'react-native';
+
+import api from '../../services/api';
+
+import * as yup from 'yup';
 
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -17,12 +21,49 @@ import { Container,
 import logoImg from '../../assets/logo.png';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import getValidationErrors from '../../utils/getValidationsErrors';
+
+interface ISignUpFormData {
+    name: string;
+    email: string;
+    password: string;
+}
 
 const SignUp: React.FC = () => {
 
     const formRef = useRef<FormHandles>(null);
+    const emailInputRef = useRef<TextInput>(null);
+    const passInputRef = useRef<TextInput>(null);
 
     const navigation = useNavigation();
+
+    const handleSubmit = useCallback(async(data: ISignUpFormData) => {
+        try {
+            formRef.current?.setErrors({});
+
+            const schema = yup.object().shape({
+                name: yup.string().required('required field'),
+                email: yup.string().required('required field').email('invalid email format'),
+                password: yup.string().min(6, 'minimum of 6 characteres'),
+            });
+
+            await schema.validate(data, { abortEarly: false });
+
+            await api.post('/users', data);
+
+            Alert.alert('Successful registration')
+            navigation.navigate('SignIn');
+        } catch(err) {
+            if(err instanceof yup.ValidationError) {
+                const errors = getValidationErrors(err);
+
+                formRef.current?.setErrors(errors)
+                return;
+            }
+
+            Alert.alert('Error when registering, check the field entered, and try again')
+        }
+    }, []);
 
     return (
         <KeyboardAvoidingView 
@@ -38,11 +79,43 @@ const SignUp: React.FC = () => {
                     <Image source={logoImg} />
                     <Title>Sign Up</Title>
 
-                    <Form ref={formRef} onSubmit={(data) => {console.log(data)}} >
+                    <Form ref={formRef} onSubmit={handleSubmit} >
 
-                    <Input name='nome' icon='user' placeholder='Name' />
-                    <Input name='email' icon='mail' placeholder='E-mail' />
-                    <Input name='password' icon='lock' placeholder='Password' />
+                    <Input 
+                        name='name' 
+                        icon='user' 
+                        placeholder='Name'
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        returnKeyType="next"
+                        onSubmitEditing={() => {
+                            emailInputRef.current?.focus()
+                        }}
+                    />
+
+                    <Input 
+                        ref={emailInputRef}
+                        name='email' 
+                        icon='mail' 
+                        placeholder='E-mail'
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        returnKeyType="next"
+                        keyboardType="email-address"
+                        onSubmitEditing={() => {
+                            passInputRef.current?.focus()
+                        }}
+                    />
+
+                    <Input 
+                        ref={passInputRef}
+                        secureTextEntry 
+                        name='password' 
+                        icon='lock' 
+                        placeholder='Password'
+                        returnKeyType="send"
+                        onSubmitEditing={() => formRef.current?.submitForm()}
+                    />
 
                     <Button onPress={() => {formRef.current?.submitForm()}} >Register</Button>
 
