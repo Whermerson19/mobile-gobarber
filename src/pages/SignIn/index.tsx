@@ -22,6 +22,7 @@ import logoImg from '../../assets/logo.png';
 import { useNavigation } from '@react-navigation/native';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from '../../utils/getValidationsErrors';
+import { useAuth } from '../../hooks/auth';
 
 interface ISignInFormData {
     email: string;
@@ -30,9 +31,11 @@ interface ISignInFormData {
 
 const SignIn: React.FC = () => {
 
+    
     const formRef = useRef<FormHandles>(null);
     const passInputRef = useRef<TextInput>(null);
-
+    
+    const { signIn } = useAuth();
     const navigation = useNavigation();
 
     const handleSubmit = useCallback(async(data: ISignInFormData) => {
@@ -46,6 +49,13 @@ const SignIn: React.FC = () => {
             });
 
             await schema.validate(data, { abortEarly: false });
+
+            await signIn({
+                email: data.email,
+                password: data.password
+            });
+
+            Alert.alert('Login successful');
         } catch(err) {
             if(err instanceof yup.ValidationError) {
                 const errors = getValidationErrors(err);
@@ -53,6 +63,8 @@ const SignIn: React.FC = () => {
                 formRef.current?.setErrors(errors);
                 return;
             }
+
+            Alert.alert('Login failed')
         }
     }, []);
 

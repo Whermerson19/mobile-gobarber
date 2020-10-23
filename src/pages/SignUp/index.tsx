@@ -63,7 +63,7 @@ const SignUp: React.FC = () => {
 
             Alert.alert('Error when registering, check the field entered, and try again')
         }
-    }, []);
+    }, [navigation]);
 
     return (
         <KeyboardAvoidingView 
