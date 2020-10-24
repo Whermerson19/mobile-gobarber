@@ -64,7 +64,7 @@ const SignIn: React.FC = () => {
                 return;
             }
 
-            Alert.alert('Login failed')
+            // Alert.alert('Login failed')
         }
     }, []);
 
@@ -100,6 +100,7 @@ const SignIn: React.FC = () => {
                         <Input 
                             ref={passInputRef}
                             secureTextEntry
+                            autoCapitalize="none"
                             name='password' 
                             icon='lock' 
                             placeholder='Password' 

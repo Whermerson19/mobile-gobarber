@@ -110,6 +110,7 @@ const SignUp: React.FC = () => {
                     <Input 
                         ref={passInputRef}
                         secureTextEntry 
+                        autoCapitalize='none'
                         name='password' 
                         icon='lock' 
                         placeholder='Password'
@@ -123,11 +124,11 @@ const SignUp: React.FC = () => {
 
                 </Container>
 
+            </ScrollView>
                 <BackToLogIn onPress={() => navigation.goBack()}>
                     <Icon name="arrow-left" size={20} color="#fff" />
                     <BackToLogInText>Log In</BackToLogInText>
                 </BackToLogIn>
-            </ScrollView>
         </KeyboardAvoidingView>
     )
 }
