@@ -1,4 +1,7 @@
 import styled from 'styled-components/native';
+import { FlatList } from 'react-native'
+
+import { Providers } from './index';
 
 export const Container = styled.View`
     flex: 1;
@@ -32,5 +35,9 @@ export const UserAvatar = styled.Image`
     width: 56px;
     height: 56px;
     border-radius: 28px;
+`;
+
+export const ProvidersList = styled(FlatList as new () => FlatList<Providers>)`
+    
 `;
 
