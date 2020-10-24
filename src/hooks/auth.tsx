@@ -4,14 +4,21 @@ import api from '../services/api';
 
 interface SignInCredentials { email: string; password: string; }
 
+interface User {
+    name: string;
+    id: string;
+    avatar_url: string;
+    email: string;
+}
+
 interface AuthContextData {
-    user: object;
+    user: User;
     loading: boolean;
     signIn(credentials: SignInCredentials): Promise<void>
     signOut(): Promise<void>
 }
 
-interface AuthState { token: string, user: object }
+interface AuthState { token: string, user: User }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
