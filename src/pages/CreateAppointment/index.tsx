@@ -1,8 +1,10 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
+
+import {  } from 'date-fns';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -23,7 +25,7 @@ import {
     TextOpenCalendarButton,
 } from './styles';
 import { Platform } from 'react-native';
-
+import { format } from 'date-fns/esm';
 
 interface IRouteParams {
     providerId: string;
@@ -41,6 +43,7 @@ interface IAvailabilityItem {
     available: boolean;
 }
 
+
 const CreateAppointment: React.FC = () => {
 
     const route = useRoute();
@@ -56,7 +59,7 @@ const CreateAppointment: React.FC = () => {
 
     const navigateBack = useCallback(() => {
         navigation.navigate("Dashboard");
-    }, [navigation.navigate]);
+    }, [navigation.navigate]); 
 
 
     useEffect(() => {
@@ -64,6 +67,19 @@ const CreateAppointment: React.FC = () => {
             return setProviders(response.data);
         });
     }, []);
+
+    useEffect(() => {
+        api.get(`/providers/${selectedProvider}/day-availability`, {
+            params: {
+                year: selectedDate.getFullYear(),
+                month: selectedDate.getMonth() + 1,
+                day: selectedDate.getDate()
+            }
+        }).then(response => {
+            setAvailability(response.data)
+        });
+    }, [selectedDate, selectedProvider]);
+
 
     const handleSelectedProvider = useCallback((provider_id: string) => {
         setSelectedProvider(provider_id);
@@ -83,17 +99,26 @@ const CreateAppointment: React.FC = () => {
         }
     }, []);
 
-    useEffect(() => {
-        api.get(`/providers/${selectedProvider}/day-availability`, {
-            params: {
-                year: selectedDate.getFullYear(),
-                month: selectedDate.getMonth() + 1,
-                day: selectedDate.getDate()
-            }
-        }).then(response => {
-            setAvailability(response.data)
-        });
-    }, [selectedDate, selectedProvider]);
+    const morningAvailability = useMemo(() => {
+        return availability.filter(({ hour }) =>  hour < 12 ).map(({ hour, available }) => {
+                    return {
+                        hour,
+                        available,
+                        hourFormatted: format(new Date().setHours(hour), 'HH:00'),
+                    }
+                })
+    }, [availability]);
+
+    const afternoonAvailability = useMemo(() => {
+        return availability.filter(({ hour, available }) =>  hour >= 12 ).map(({ hour, available }) => {
+                    return {
+                        hour,
+                        available,
+                        hourFormatted: format(new Date().setHours(hour), 'HH:00'),
+                    }
+                })
+    }, [availability]);
+
 
     return (
         <Container>
@@ -127,8 +152,9 @@ const CreateAppointment: React.FC = () => {
                         </ProviderContainer>
                     )}
                 />
-            </ProvidersListContainer>
 
+            </ProvidersListContainer>
+            
             <Calendar>
                 <Title>Selecione uma data</Title>
                 <OpenCalendarButton onPress={handleOpenCalendar} >
