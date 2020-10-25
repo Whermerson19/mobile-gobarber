@@ -64,7 +64,7 @@ const SignIn: React.FC = () => {
                 return;
             }
 
-            // Alert.alert('Login failed')
+            Alert.alert('Login failed')
         }
     }, []);
 

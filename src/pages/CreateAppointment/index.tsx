@@ -36,6 +36,11 @@ export interface IProviders {
     avatar_url: string;
 }
 
+interface IAvailabilityItem {
+    hour: number;
+    available: boolean;
+}
+
 const CreateAppointment: React.FC = () => {
 
     const route = useRoute();
@@ -47,6 +52,7 @@ const CreateAppointment: React.FC = () => {
     const [selectedProvider, setSelectedProvider] = useState(providerId);
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const [availability, setAvailability] = useState<IAvailabilityItem[]>([]);
 
     const navigateBack = useCallback(() => {
         navigation.navigate("Dashboard");
@@ -76,6 +82,18 @@ const CreateAppointment: React.FC = () => {
             setSelectedDate(date);
         }
     }, []);
+
+    useEffect(() => {
+        api.get(`/providers/${selectedProvider}/day-availability`, {
+            params: {
+                year: selectedDate.getFullYear(),
+                month: selectedDate.getMonth() + 1,
+                day: selectedDate.getDate()
+            }
+        }).then(response => {
+            setAvailability(response.data)
+        });
+    }, [selectedDate, selectedProvider]);
 
     return (
         <Container>
@@ -112,7 +130,7 @@ const CreateAppointment: React.FC = () => {
             </ProvidersListContainer>
 
             <Calendar>
-                <Title>Choose a date</Title>
+                <Title>Selecione uma data</Title>
                 <OpenCalendarButton onPress={handleOpenCalendar} >
                     <TextOpenCalendarButton>Selecionar Data</TextOpenCalendarButton>
                 </OpenCalendarButton>
