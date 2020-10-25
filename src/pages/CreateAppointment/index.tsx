@@ -4,6 +4,8 @@ import Icon from 'react-native-vector-icons/Feather';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 import { 
     Container, 
     Header, 
@@ -15,7 +17,13 @@ import {
     ProviderContainer,
     ProviderAvatar,
     ProviderName,
+    Calendar,
+    Title,
+    OpenCalendarButton,
+    TextOpenCalendarButton,
 } from './styles';
+import { Platform } from 'react-native';
+
 
 interface IRouteParams {
     providerId: string;
@@ -37,6 +45,8 @@ const CreateAppointment: React.FC = () => {
 
     const [providers, setProviders] = useState<IProviders[]>([]);
     const [selectedProvider, setSelectedProvider] = useState(providerId);
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     const navigateBack = useCallback(() => {
         navigation.navigate("Dashboard");
@@ -44,12 +54,28 @@ const CreateAppointment: React.FC = () => {
 
 
     useEffect(() => {
-        api.get('providers').then(response => setProviders(response.data));
+        api.get('providers').then(response => {
+            return setProviders(response.data);
+        });
     }, []);
 
     const handleSelectedProvider = useCallback((provider_id: string) => {
         setSelectedProvider(provider_id);
-    }, [setSelectedProvider]);
+    }, []);
+
+    const handleOpenCalendar = useCallback(() => {
+        setShowCalendar(!showCalendar)
+    }, [setShowCalendar]);
+
+    const handleDateChange = useCallback((event: any, date: Date | undefined) => {
+        if(Platform.OS === 'android'){
+            setShowCalendar(false)
+        }
+
+        if(date) {
+            setSelectedDate(date);
+        }
+    }, []);
 
     return (
         <Container>
@@ -64,7 +90,7 @@ const CreateAppointment: React.FC = () => {
 
             <ProvidersListContainer>
                 <ProvidersList 
-                    
+
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     data={providers}
@@ -84,6 +110,22 @@ const CreateAppointment: React.FC = () => {
                     )}
                 />
             </ProvidersListContainer>
+
+            <Calendar>
+                <Title>Choose a date</Title>
+                <OpenCalendarButton onPress={handleOpenCalendar} >
+                    <TextOpenCalendarButton>Selecionar Data</TextOpenCalendarButton>
+                </OpenCalendarButton>
+                { showCalendar && (
+                    <DateTimePicker 
+                    mode="date"
+                    display="calendar" 
+                    value={selectedDate} 
+                    onChange={handleDateChange}
+                /> 
+                ) }
+            </Calendar>
+
         </Container>
     );
 }
