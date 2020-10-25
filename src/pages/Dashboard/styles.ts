@@ -39,7 +39,7 @@ export const UserAvatar = styled.Image`
 `;
 
 export const ProvidersList = styled(FlatList as new () => FlatList<Providers>)`
-
+  padding: 32px 24px 16px;
 `;
 
 export const ProvidersListTitle = styled.Text`
@@ -47,6 +47,7 @@ export const ProvidersListTitle = styled.Text`
   color: #f4ede8;
   font-size: 24px;
   margin-bottom: 24px;
+  margin-top: 15px;
 `;
 
 export const ProviderContainer = styled(RectButton)`

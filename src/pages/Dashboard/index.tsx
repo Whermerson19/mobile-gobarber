@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/auth';
 
+import { Text } from 'react-native';
+
 import Icon from 'react-native-vector-icons/Feather';
 
 import Button from '../../components/Button'
@@ -66,6 +68,7 @@ const Dashboard: React.FC = () => {
                 <ProfileButton onPress={navigateProfile} >
                     <UserAvatar source={{ uri: user.avatar_url }} />
                 </ProfileButton>
+                <Button onPress={signOut} >sair</Button>
             </Header>
 
             <ProvidersList 
@@ -79,7 +82,6 @@ const Dashboard: React.FC = () => {
                 renderItem={({ item: provider }) => (
                     <ProviderContainer onPress={() => navigateCreateAppointment(provider.id)}>
                         <ProviderAvatar source={{ uri: provider.avatar_url }} />
-            
                         <ProviderInfo>
                             <ProviderName>{provider.name}</ProviderName>
                             <ProviderMeta>
