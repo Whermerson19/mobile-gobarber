@@ -1,3 +1,4 @@
+import { TabRouter } from '@react-navigation/native';
 import { FlatList } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
@@ -10,6 +11,16 @@ interface IProviderContainerProps {
 
 interface IProviderNameProps {
     selected: boolean;
+}
+
+interface IHourProps {
+    available: boolean;
+    selected: boolean;
+}
+
+interface IHourTextProps {
+    selected: boolean;
+    available: boolean;
 }
 
 export const Container = styled.View`
@@ -42,6 +53,8 @@ export const UserAvatar = styled.Image`
     border-radius: 28px;
     margin-left: auto;
 `;
+
+export const Content = styled.ScrollView``;
 
 export const ProvidersListContainer = styled.View`
     height: 112px;
@@ -101,4 +114,41 @@ export const TextOpenCalendarButton = styled.Text`
     font-size: 16px;
     color: #232129;
 `;
+
+export const Schedule = styled.View`
+    padding: 24px 0 16px;
+`;
+
+export const Section = styled.View`
+    margin-bottom: 24px;
+`;
+
+export const SectionTitle = styled.Text`
+    font-size: 18px;
+    font-family: 'RobotoSlab-Regular';
+    color: #999591;
+    margin: 0 24px 12px;
+`;
+
+export const SectionContent = styled.ScrollView.attrs({
+    contentContainerStyle: { paddingHorizontal: 24 },
+    horizontal: true,
+    showsHorizontalScrollIndicator: false
+})``;
+
+export const Hour = styled(RectButton)<IHourProps>`
+    padding: 12px;
+    background: ${props => props.selected && props.available ? "#ff9000" : "#3e3b47"};
+    border-radius: 10px;
+    margin-left: 8px;
+
+    opacity: ${props => (props.available ? 1 : 0.3)}
+`;
+
+export const HourText = styled.Text<IHourTextProps>`
+    color: ${props => props.selected && props.available ? "#232129" : "#f4ede8"};
+    font-family: "RobotoSlab-Regular";
+    font-size: 16px;
+`;
+
 
