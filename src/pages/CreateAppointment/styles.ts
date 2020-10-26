@@ -20,7 +20,6 @@ interface IHourProps {
 
 interface IHourTextProps {
     selected: boolean;
-    available: boolean;
 }
 
 export const Container = styled.View`
@@ -88,7 +87,6 @@ export const ProviderName = styled.Text<IProviderNameProps>`
     color: ${props => props.selected ? "#232129" : "#f4ede8"};
 `;
 
-
 export const Calendar = styled.View`
 
 `;
@@ -142,13 +140,28 @@ export const Hour = styled(RectButton)<IHourProps>`
     border-radius: 10px;
     margin-left: 8px;
 
-    opacity: ${props => (props.available ? 1 : 0.3)}
+    opacity: ${props => (props.available ? 1 : 0.3)};
 `;
 
 export const HourText = styled.Text<IHourTextProps>`
-    color: ${props => props.selected && props.available ? "#232129" : "#f4ede8"};
+    color: ${props => props.selected ? "#232129" : "#f4ede8"};
     font-family: "RobotoSlab-Regular";
     font-size: 16px;
+`;
+
+export const CreateAppointmentButton = styled(RectButton)`
+    height: 50px;
+    background: #ff9000;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 12px 24px;
+`;
+
+export const CreateAppointmentButtonText = styled.Text`
+    font-family: "RobotoSlab-Medium";
+    font-size: 18px;
+    color: #232129;
 `;
 
 
