@@ -3,6 +3,8 @@ import { View, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-na
 import { useNavigation } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import ImagePicker from 'react-native-image-picker';
+
 import * as yup from 'yup';
 
 import Input from '../../components/Input';
@@ -57,11 +59,11 @@ const Profile: React.FC = () => {
                     then: yup.string().required(),
                     otherwise: yup.string()
                 }),
-                confirm_password: yup.string().when('password', {
+                password_confirmation: yup.string().when('password', {
                     is: (val) => !!val.length,
                     then: yup.string().required(),
                     otherwise: yup.string()
-                }).oneOf([yup.ref('password')], 'Senhas não conferem'),
+                }).oneOf([yup.ref('password'), undefined], 'Senhas não conferem'),
             });
 
             await schema.validate(data, { abortEarly: false });
@@ -88,28 +90,62 @@ const Profile: React.FC = () => {
 
                 formRef.current?.setErrors(errors);
 
+                Alert.alert("caiu aqui")
+
                 return
             }
 
             Alert.alert('Houve um erro ao realizar as alterações, tente novamente')
         }
-    }, [navigation]);
+    }, [navigation, updateUser]);
+
+    const handleUpdateAvatar = useCallback(() => {
+        ImagePicker.showImagePicker({
+            title: "Selecionar Avatar",
+            cancelButtonTitle: "Cancelar",
+            takePhotoButtonTitle: "Usar câmera",
+            chooseFromLibraryButtonTitle: "Escolher da galeria"
+        }, response => {
+            if (response.didCancel) {
+                return;
+            } else if (response.error) {
+                Alert.alert("Ocorreu um erro");
+                return;
+            } else {
+                const source = { uri: response.uri };
+                console.log(source);
+                
+                const data = new FormData();
+
+                data.append('avatar', {
+                    uri: response.uri,
+                    type: "image/jpeg",
+                    name: `${user.id}.jpg`,
+                });
+
+                api.patch('users/avatar', data).then(api_response => {
+                    updateUser(api_response.data);
+                });
+        }
+        });
+    
+    }, [updateUser, user.id]);
 
     return (
 
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={ Platform.OS === 'ios' ? 'padding' : undefined }
-            enabled
+        style={{ flex: 1 }}
+        behavior={ Platform.OS === 'ios' ? 'padding' : undefined }
+        enabled
         >
 
             <ScrollView
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{ flex: 1 }}
-            >
+                >
 
                 <Container>
-                    <AvatarButton onPress={handleBackButton}>
+                    <AvatarButton onPress={handleUpdateAvatar}>
                         <Avatar source={{ uri: user.avatar_url }} />
                     </AvatarButton>
                     <View>
@@ -171,6 +207,7 @@ const Profile: React.FC = () => {
                             secureTextEntry
                             onSubmitEditing={() => formRef.current?.submitForm()}
                         />
+                        <View style={{marginBottom: 24}} ></View>
 
                         <Button onPress={() => formRef.current?.submitForm()} >
                             Confirmar mudanças
